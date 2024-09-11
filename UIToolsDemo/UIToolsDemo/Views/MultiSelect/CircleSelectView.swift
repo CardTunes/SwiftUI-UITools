@@ -11,7 +11,7 @@ import UITools
 
 struct CircleSelectView: View {
     @State var items = [Item]()
-    @State var selection = OrderedSet<UUID>()
+    @State var selection = Set<UUID>()
     
     var body: some View {
         MultiSelect(selection: $selection, items: items)

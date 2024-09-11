@@ -30,7 +30,7 @@ extension CGRect : Hashable {
     }
 }
 public struct MultiSelect<Content: View, T : Identifiable>: View {
-    @Binding var selection:OrderedSet<UUID>
+    @Binding var selection:Set<UUID>
     @State internal var frames = [CGRect]()
     @State private var lastIndex:Int?
     @State private var origin:Int?
@@ -38,7 +38,7 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
     private var items:[T]
     private let content: Content
 
-    public init(selection:Binding<OrderedSet<UUID>>, items:[T],  @ViewBuilder content: () -> Content) {
+    public init(selection:Binding<Set<UUID>>, items:[T],  @ViewBuilder content: () -> Content) {
         self.content = content()
         _selection = selection
         self.items = items
@@ -113,7 +113,7 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
             }
                
             if itemsToAdd.count > 0 {
-                add(items: &itemsToAdd, direction: direction)
+                add(items: &itemsToAdd)
             }
 
         }
@@ -139,46 +139,42 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
     
     private func addNew(id:UUID) {
         selection.removeAll()
-        selection.append(id)
+        selection.insert(id)
     }
 
-    private func add(id:UUID,  direction:Direction) {
-        if direction == .Ascending {
-           selection.insert(id, at: 0)
-       }
-       else {
-           selection.append(id)
-       }
+//    private func add(id:UUID,  direction:Direction) {
+//        selection.insert(id)
+//        if direction == .Ascending {
+//           selection.insert(id, at: 0)
+//       }
+//       else {
+//           selection.append(id)
+//       }
+//    }
+    
+//    private func add(start:Int, end:Int) {
+//        var items:[UUID] = items[start...end].map{($0.id as? UUID)!}
+//        selection.formUnion(items)
+////        if direction == .Ascending {
+////            items.append(contentsOf: selection)
+////            selection = OrderedSet(items)
+////       }
+////       else {
+////           selection.append(contentsOf: items)
+////       }
+//    }
+    
+    private func add(items: inout [UUID]) {
+        selection.formUnion(items)
     }
     
-    private func add(start:Int, end:Int,  direction:Direction) {
-        var items:[UUID] = items[start...end].map{($0.id as? UUID)!}
-        if direction == .Ascending {
-            items.append(contentsOf: selection)
-            selection = OrderedSet(items)
-       }
-       else {
-           selection.append(contentsOf: items)
-       }
-    }
-    
-    private func add(items: inout [UUID],  direction:Direction) {
-        if direction == .Ascending {
-            items.append(contentsOf: selection)
-            selection = OrderedSet(items)
-       }
-       else {
-           selection.append(contentsOf: items)
-       }
-    }
-    
-    private func remove(start:Int, end:Int) {
-        let items:[UUID] = items[start...end].map{($0.id as? UUID)!}
-        selection.removeAll(where: {items.contains($0)})
-    }
-    
+//    private func remove(start:Int, end:Int) {
+//        let items:[UUID] = items[start...end].map{($0.id as? UUID)!}
+//        selection.formSymmetricDifference(items)
+//    }
+//    
     private func remove(items: [UUID]) {
-        selection.removeAll(where: {items.contains($0)})
+        selection.formSymmetricDifference(items)
     }
     
     private func remove(id:UUID) {
