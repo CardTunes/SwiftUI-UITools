@@ -88,24 +88,26 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
             let lastId = self.items[last].id as? UUID,
             let orig = origin
             {
+            let oldDir:Direction = last > orig ? .Ascending : .Descending
             let direction:Direction = newIndex > last ? .Ascending : .Descending
-
+            let dirChanged = oldDir != direction
+            
             var itemsToRemove = [UUID]()
             var itemsToAdd = [UUID]()
             
-            let dirChanged = dirChanged(last: last, direction: direction)
-            
             if dirChanged {
-                let start = direction == .Ascending ? last : newIndex + 1
-                let end = direction == .Ascending ? newIndex - 1 : last
-                itemsToRemove = items[start...end].map{($0.id as? UUID)!}
+                let rngToRemove =  direction == .Ascending ?
+                    Range(last...newIndex - 1) : Range(newIndex + 1...last)
+                itemsToRemove = items[rngToRemove].map{($0.id as? UUID)!}
                 
-                itemsToAdd = getOverlap(newIndex: newIndex, orig:orig, direction: direction)
+                if let overlapRange = getOverlapRange(newIndex: newIndex, orig: orig, direction: direction) {
+                    itemsToAdd =  items[overlapRange].map{($0.id as? UUID)!}
+                }
             }
             else {
-                let start = direction == .Ascending ? last + 1 : newIndex
-                let end = direction == .Ascending ? newIndex : last - 1
-                itemsToAdd = items[start...end].map{($0.id as? UUID)!}
+                let rngToAdd =  direction == .Ascending ?
+                    Range(last + 1...newIndex) : Range(newIndex...last - 1)
+                itemsToAdd = items[rngToAdd].map{($0.id as? UUID)!}
             }
                
             if itemsToRemove.count > 0 {
@@ -142,37 +144,10 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
         selection.insert(id)
     }
 
-//    private func add(id:UUID,  direction:Direction) {
-//        selection.insert(id)
-//        if direction == .Ascending {
-//           selection.insert(id, at: 0)
-//       }
-//       else {
-//           selection.append(id)
-//       }
-//    }
-    
-//    private func add(start:Int, end:Int) {
-//        var items:[UUID] = items[start...end].map{($0.id as? UUID)!}
-//        selection.formUnion(items)
-////        if direction == .Ascending {
-////            items.append(contentsOf: selection)
-////            selection = OrderedSet(items)
-////       }
-////       else {
-////           selection.append(contentsOf: items)
-////       }
-//    }
-    
     private func add(items: inout [UUID]) {
         selection.formUnion(items)
     }
-    
-//    private func remove(start:Int, end:Int) {
-//        let items:[UUID] = items[start...end].map{($0.id as? UUID)!}
-//        selection.formSymmetricDifference(items)
-//    }
-//    
+
     private func remove(items: [UUID]) {
         selection.formSymmetricDifference(items)
     }
@@ -181,33 +156,25 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
         selection.remove(id)
     }
 
-//    func contains(id:UUID) -> Bool {
-//        return selection.contains(id)
-//    }
-
     private func removeAll() {
         selection.removeAll()
     }
     
-    private func getOverlap(newIndex:Int, orig:Int, direction:Direction) -> [UUID] {
-        var start = 0
-        var end = 0
+    private func getOverlapRange(newIndex:Int, orig:Int, direction:Direction) -> Range<Int>? {
         if direction == .Ascending {
             if newIndex <= orig {
-                return [UUID]()
+                return nil
             }
-            start = orig
-            end = newIndex
+            return Range(orig...newIndex)
         }
         else {
             if newIndex >= orig {
-                return [UUID]()
+                return nil
             }
-            start = newIndex
-            end = orig
+            return Range(newIndex...orig)
         }
+        return nil
         
-        return items[start...end].map{($0.id as? UUID)!}
     }
         
     private func dirChanged(last:Int,  direction:Direction) -> Bool {
