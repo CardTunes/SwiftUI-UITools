@@ -7,56 +7,113 @@
 
 import Foundation
 import SwiftUI
-import Collections
+import AppKit
 
 enum Direction {
     case Descending
     case Ascending
 }
 
-extension OrderedSet where Element == UUID {
-    func display() -> String {
-        let result:[String] = self.map{$0.uuidString}
-        return result.joined(separator: "\n")
-    }
-}
+//extension OrderedSet where Element == UUID {
+//    func display() -> String {
+//        let result:[String] = self.map{$0.uuidString}
+//        return result.joined(separator: "\n")
+//    }
+//}
 
-extension CGRect : Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(origin.x)
-        hasher.combine(origin.y)
-        hasher.combine(size.width)
-        hasher.combine(size.height)
-    }
-}
+//extension CGRect : Hashable {
+//    public func hash(into hasher: inout Hasher) {
+//        hasher.combine(origin.x)
+//        hasher.combine(origin.y)
+//        hasher.combine(size.width)
+//        hasher.combine(size.height)
+//    }
+
+//}
+
+
 public struct MultiSelect<Content: View, T : Identifiable>: View {
     @Binding var selection:Set<UUID>
+    var enabled = true
     @State internal var frames = [CGRect]()
     @State private var lastIndex:Int?
     @State private var origin:Int?
+   
     
     private var items:[T]
     private let content: Content
-
-    public init(selection:Binding<Set<UUID>>, items:[T],  @ViewBuilder content: () -> Content) {
+    
+    public init(selection:Binding<Set<UUID>>, enabled:Bool, items:[T],  @ViewBuilder content: () -> Content) {
         self.content = content()
         _selection = selection
+        self.enabled = enabled
         self.items = items
+        
+        self.location = CGPoint(x: 300, y: 300)
     }
 
     public var body: some View {
-        GeometryReader {geometry in
-            content
-                .contentShape(Rectangle())
-                .gesture(
-                    simpleDrag()
-                )
-                .onPreferenceChange(BoundsPreferenceKey.self) {preferences in
-                   frames = preferences.map{geometry[$0.bounds]}
-                }
-        }
+      
+            if enabled {
+                //GeometryReader {geometry in
+                    content
+                    
+                    
+                        .onPreferenceChange(RectPreferenceKey.self) {preferences in
+                            frames = preferences.map{$0.rect}
+                        }
+                        .contentShape(Rectangle())
+                    
+                        .gesture(
+                            simpleDrag()
+                        )
+                    //                    .backgroundPreferenceValue(BoundsPreferenceKey.self) { preferences in
+                    //                        GeometryReader { geometry in
+                    //                            frames = preferences.map{geometry[$0.bounds]}
+                    //                            Color.clear
+                    //                        }
+                    //                    }
+                    //  .background(overlay())
+                    //      .overlay(overlay())
+                    //setPreferences()
+                    //  setPreference()
+               // }
+                .coordinateSpace(name: "cfd31281-32a6-438a-a348-f3ad4bd2319a")
+//
+            }
+            else {
+                content
+                    .contentShape(Rectangle())
+                    .allowsHitTesting(false)
+                  //  .overlay(overlay())
+            }
+      
     }
-   
+    func handleDrop(items:[String], location:CGPoint) -> Bool {
+        return true
+        
+    }
+//    func overlay() -> some View {
+//        GeometryReader { geometry in
+//            Color.clear
+//                .onPreferenceChange(RectPreferenceKey.self) {preferences in
+//                    frames = preferences.map{geometry[$0.bounds]}
+//                }
+//        }
+//        
+//    }
+    
+//   
+//    @ViewBuilder
+//    func setPreferences() -> some View {
+//       self
+//            .backgroundPreferenceValue(BoundsPreferenceKey.self) { preferences in
+//                GeometryReader { geometry in
+//                    Text("")
+//                }
+//            }
+//    }
+    
     @State internal var location:CGPoint?  {
         didSet {
             if let val = self.location {
@@ -68,6 +125,11 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
         }
     }
     
+    var shiftKeyIsDown : Bool {
+        let flags = NSEvent.modifierFlags
+        return flags.contains(.shift)
+    }
+    
     // For testing
     internal func setLocation(loc:CGPoint) {
             DispatchQueue.main.async {
@@ -75,10 +137,17 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
             }
     }
     
+    private func getLastId() -> UUID? {
+        guard let last = lastIndex else {
+            return nil
+        }
+        return items[last].id as? UUID
+    }
+    
     private func setSelection(newValue:CGPoint) {
         guard let newIndex = getSelectionIndex(location: newValue),
             let id = items[newIndex].id as? UUID,
-            newIndex != lastIndex
+            id !=  getLastId()
         else {
             return
         }
@@ -140,7 +209,12 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
     }
     
     private func addNew(id:UUID) {
-        selection.removeAll()
+        // TODO need to have variant of setlocation for shfit key to remove all from origin to end
+        // Only remove previous if shift key not pressed
+       // if !shiftKeyIsDown {
+            selection.removeAll()
+        //}
+       
         selection.insert(id)
     }
 
@@ -176,18 +250,6 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
         return nil
         
     }
-        
-    private func dirChanged(last:Int,  direction:Direction) -> Bool {
-        guard let orig = origin else {
-            return false
-        }
-        if last == orig  {
-            return false
-        }
-        
-        let oldDir:Direction = last < orig ? .Descending : .Ascending
-        return oldDir != direction
-    }
 
     private func simpleDrag() -> some Gesture {
         DragGesture(minimumDistance: 0)
@@ -202,4 +264,3 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
             })
     }
 }
-

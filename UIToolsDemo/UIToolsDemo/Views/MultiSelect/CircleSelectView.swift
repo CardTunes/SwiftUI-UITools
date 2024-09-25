@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Collections
-import UITools
 
 struct CircleSelectView: View {
     @State var items = [Item]()
