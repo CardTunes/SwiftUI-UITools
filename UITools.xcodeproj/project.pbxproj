@@ -16,7 +16,6 @@
 		ECA4A68A2C8FECCD00DE934E /* BoundsPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA4A6892C8FECCD00DE934E /* BoundsPreferenceKey.swift */; };
 		ECA4A68D2C8FED0900DE934E /* FrameGrabModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA4A68C2C8FED0900DE934E /* FrameGrabModifier.swift */; };
 		ECA4A6912C8FED4400DE934E /* MultiSelect.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA4A6902C8FED4400DE934E /* MultiSelect.swift */; };
-		ECE788E02CA1DF4F0072FF27 /* MusicManData in Resources */ = {isa = PBXBuildFile; fileRef = ECE788DF2CA1DF4F0072FF27 /* MusicManData */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,7 +39,6 @@
 		ECA4A6892C8FECCD00DE934E /* BoundsPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundsPreferenceKey.swift; sourceTree = "<group>"; };
 		ECA4A68C2C8FED0900DE934E /* FrameGrabModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameGrabModifier.swift; sourceTree = "<group>"; };
 		ECA4A6902C8FED4400DE934E /* MultiSelect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSelect.swift; sourceTree = "<group>"; };
-		ECE788DF2CA1DF4F0072FF27 /* MusicManData */ = {isa = PBXFileReference; lastKnownFileType = folder; name = MusicManData; path = ../MusicMan9/MusicManData; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +79,6 @@
 		ECA4A6462C8FBFC200DE934E = {
 			isa = PBXGroup;
 			children = (
-				ECE788DF2CA1DF4F0072FF27 /* MusicManData */,
 				ECA4A6522C8FBFC200DE934E /* UITools */,
 				ECA4A65C2C8FBFC200DE934E /* UIToolsTests */,
 				ECA4A6512C8FBFC200DE934E /* Products */,
@@ -264,7 +261,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECE788E02CA1DF4F0072FF27 /* MusicManData in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

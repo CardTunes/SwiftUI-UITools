@@ -93,26 +93,6 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
         return true
         
     }
-//    func overlay() -> some View {
-//        GeometryReader { geometry in
-//            Color.clear
-//                .onPreferenceChange(RectPreferenceKey.self) {preferences in
-//                    frames = preferences.map{geometry[$0.bounds]}
-//                }
-//        }
-//        
-//    }
-    
-//   
-//    @ViewBuilder
-//    func setPreferences() -> some View {
-//       self
-//            .backgroundPreferenceValue(BoundsPreferenceKey.self) { preferences in
-//                GeometryReader { geometry in
-//                    Text("")
-//                }
-//            }
-//    }
     
     @State internal var location:CGPoint?  {
         didSet {
@@ -152,6 +132,7 @@ public struct MultiSelect<Content: View, T : Identifiable>: View {
             return
         }
 
+        
         
         if let last = lastIndex,
             let lastId = self.items[last].id as? UUID,
